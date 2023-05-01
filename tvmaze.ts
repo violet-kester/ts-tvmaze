@@ -4,7 +4,9 @@ import { ids } from "webpack";
 
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
+const $episodesList = $("#episodesList");
 const $searchForm = $("#searchForm");
+const $episodesBtn = $(".Show-getEpisodes");
 
 const BASE_URL = "http://api.tvmaze.com/";
 
@@ -128,7 +130,7 @@ interface EpisodeInterface {
   id: number,
   name: string,
   season: string,
-  number: string
+  number: string;
 }
 
 function createEpisode(episode): EpisodeInterface {
@@ -136,31 +138,46 @@ function createEpisode(episode): EpisodeInterface {
     id: episode.id,
     name: episode.name,
     season: episode.season,
-    number: episode.number.toString();
-  }
+    number: episode.number.toString()
+  };
 }
 
 async function getEpisodesOfShow(id): Promise<[]> {
-  const response = await axios.get(`${BASE_URL}shows/${id}/episodes}`);
+  const response = await axios.get(`${BASE_URL}shows/${id}/episodes`);
   const episodes = response.data.map(r => {
     console.log(createEpisode(r));
     return createEpisode(r);
-  })
+  });
   return episodes;
 }
 
 /** Write a clear docstring for this function... */
 
 function populateEpisodes(episodes) {
-  const episodeButtons = $(".Show-getEpisodes");
-  episodeButtons.addEventListen
+  $episodesList.empty();
+
+  for (let episode of episodes) {
+    const $episode = $(
+      `<li>
+        <p>Name: ${episode.name}</p>
+        <p>Season: ${episode.season}</p>
+        <p>Number: ${episode.number}</p>
+       </li>
+      `);
+
+    $episodesList.append($episode);
+  }
+  $episodesArea.show();
 }
 
+async function handleClick(evt) {
 
-$searchForm.on("submit", async function (evt) {
-  evt.preventDefault();
-  await searchForShowAndDisplay();
-});
+  const showId = +$(evt.target).closest(".Show").data("show-id");
+  console.log("handleClick showId", showId);
 
-// get id
-//
+  const episodes = await getEpisodesOfShow(showId);
+  populateEpisodes(episodes);
+
+}
+
+$showsList.on("click", $episodesBtn, handleClick);

@@ -12833,7 +12833,9 @@ var axios_1 = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 var $showsList = $("#showsList");
 var $episodesArea = $("#episodesArea");
+var $episodesList = $("#episodesList");
 var $searchForm = $("#searchForm");
+var $episodesBtn = $(".Show-getEpisodes");
 var BASE_URL = "http://api.tvmaze.com/";
 /** Given a search term, search for tv shows that match that query.
  *
@@ -12934,7 +12936,7 @@ function getEpisodesOfShow(id) {
         var response, episodes;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, axios_1.default.get("".concat(BASE_URL, "shows/").concat(id, "/episodes}"))];
+                case 0: return [4 /*yield*/, axios_1.default.get("".concat(BASE_URL, "shows/").concat(id, "/episodes"))];
                 case 1:
                     response = _a.sent();
                     episodes = response.data.map(function (r) {
@@ -12947,7 +12949,33 @@ function getEpisodesOfShow(id) {
     });
 }
 /** Write a clear docstring for this function... */
-// function populateEpisodes(episodes) { }
+function populateEpisodes(episodes) {
+    $episodesList.empty();
+    for (var _i = 0, episodes_1 = episodes; _i < episodes_1.length; _i++) {
+        var episode = episodes_1[_i];
+        var $episode = $("<li>\n        <p>Name: ".concat(episode.name, "</p>\n        <p>Season: ").concat(episode.season, "</p>\n        <p>Number: ").concat(episode.number, "</p>\n       </li>\n      "));
+        $episodesList.append($episode);
+    }
+    $episodesArea.show();
+}
+function handleClick(evt) {
+    return __awaiter(this, void 0, void 0, function () {
+        var showId, episodes;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    showId = +$(evt.target).closest(".Show").data("show-id");
+                    console.log("handleClick showId", showId);
+                    return [4 /*yield*/, getEpisodesOfShow(showId)];
+                case 1:
+                    episodes = _a.sent();
+                    populateEpisodes(episodes);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+$showsList.on("click", $episodesBtn, handleClick);
 
 
 /***/ })
